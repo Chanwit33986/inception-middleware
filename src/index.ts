@@ -7,6 +7,7 @@ import {
   setCookieInception,
 } from "./utils/inecptionCookies";
 import {
+  checkUserAppMenuPermission,
   generateRedirectUrl,
   getAvaliableFirstTimeToPage,
   getInceptionUser,
@@ -34,6 +35,13 @@ export const InceptionMiddleware = async (request: NextRequest) => {
           const response = NextResponse.redirect(
             new URL(decryptJson?.origin_target)
           );
+          if (decryptJson?.param_for_menu !== null) {
+            setCookieInception(
+              response,
+              "tlt_p_for_menu",
+              decryptJson?.param_for_menu
+            );
+          }
           if (!hasInceptionCookie(request, "tlt_u_data")) {
             const userRes = await getInceptionUser(firstTimeRes?.data);
             if (userRes) {
@@ -53,12 +61,53 @@ export const InceptionMiddleware = async (request: NextRequest) => {
         }
       }
     } else if (hasInceptionCookie(request, "tlt_main")) {
+      let response;
+      // let inceptionUser;
       let guid = getInceptionCookieServer(request, "tlt_main");
+
+      // if (hasInceptionCookie(request, "tlt_u_data")) {
+      //   inceptionUser = getInceptionCookieServer(request, "tlt_u_data");
+      // } else {
+      //   const userRes = await getInceptionUser(guid);
+      //   if (userRes) {
+      //     response = NextResponse.next();
+      //     setCookieInception(response, "tlt_u_data", userRes?.data);
+      //   } else {
+      //     let redirectUrl = generateRedirectUrl(
+      //       "RE_LOGIN",
+      //       "คุณได้เข้าใช้งานเกินเวลาที่กำหนด ขอให้ทำการ Login ใหม่อีกครั้ง",
+      //       "Session Time Out"
+      //     );
+      //     clearAllInpceptionCookie(request);
+      //     return NextResponse.redirect(redirectUrl);
+      //   }
+      // }
+      // if (inceptionUser) {
+      //   let appMenuPermissionObj = {
+      //     mode: "menu",
+      //     app_id: appId,
+      //     menu: request.nextUrl.pathname,
+      //     user_id: inceptionUser?.user_id,
+      //   };
+      //   const appMenuPermissionRes = await checkUserAppMenuPermission(
+      //     appMenuPermissionObj
+      //   );
+      //   if (appMenuPermissionRes && !appMenuPermissionRes.data) {
+      //     let redirectUrl = generateRedirectUrl(
+      //       "RE_LOGIN",
+      //       "คุณไม่มีสิทธิ์เข้าถึงเมนูนี้",
+      //       "ไม่สามารถ Get permission ได้หรืออาจจะไม่ได้ถูก Set สิทธิไว้ ตรวจสอบการ connect stored และสิทธิการใช้งาน"
+      //     );
+      //     clearAllInpceptionCookie(request);
+      //     return NextResponse.redirect(redirectUrl);
+      //   }
+      // }
+
       if (guid) {
         const inCreaseRes = await increaseInceptionTimeout(guid);
+        response = NextResponse.next();
         // if (inCreaseRes && inCreaseRes?.status === 1) {
         if (inCreaseRes) {
-          const response = NextResponse.next();
           setCookieInception(
             response,
             "tlt_timeout",

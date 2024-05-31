@@ -71,6 +71,18 @@ export const increaseInceptionTimeout = async (guid: string) => {
   }
 };
 
+export const checkUserAppMenuPermission = async (payload: any) => {
+  try {
+    let url = `${process.env.INCEPTION_API_URL}check/userpermission`;
+    const response = await request.post(url, payload);
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    return null;
+  }
+};
+
 export const printErrorMessage = (message: any) => {
   console.log("--------------Inception MiddleWare Error--------------");
   console.log(message);
