@@ -16,19 +16,23 @@ export const getInceptionUser = async (guid: string) => {
   }
 };
 
-export const generateRedirectUrl = () => {
+export const generateRedirectUrl = (
+  refId: string,
+  directMessage: string,
+  directMessageDev: string
+) => {
   let secretKey = process.env.SECRET_KEY || "";
   let currentTarget = process.env.CURRENT_TARGET || "";
   let appId = process.env.APP_ID || "";
   let payload = {
-    ref_id: "RE_LOGIN",
+    ref_id: refId,
     app_id: appId,
     menu_id: "",
     origin_target: currentTarget,
     direct_controller: "",
     direct_view: "",
-    direct_message: "",
-    direct_message_dev: "",
+    direct_message: directMessage,
+    direct_message_dev: directMessageDev,
     param_for_menu: "",
   };
   let inceptionUrl = process.env.INCEPTION_URL || "";
