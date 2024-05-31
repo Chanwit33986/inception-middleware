@@ -158,7 +158,16 @@ export const GetInceptionUserServer = async (request: NextRequest) => {
   try {
     if (hasInceptionCookie(request, "tlt_u_data")) {
       return getInceptionCookieServer(request, "tlt_u_data");
+    } else {
+      let guid = getInceptionCookieServer(request, "tlt_main");
+      if (guid) {
+        const userRes = await getInceptionUser(guid);
+        if (userRes) {
+          return userRes?.data;
+        }
+      }
     }
+    return undefined;
   } catch (error) {
     printErrorMessage(error);
   }
